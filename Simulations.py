@@ -82,11 +82,11 @@ RandomEscapeData = EscapeFunction(Title='Random escape', NoEscapeLabel='No escap
 
 NonRandomEscapeData = EscapeFunction(Title='Non-Random escape', NoEscapeLabel='No escape', EscapeLabel='Age-independant escape', NumberOfDaughters=Data['NumberOfDaughters'], EscapeFunction=LinearEscape(Data['NumberOfDaughters'], 0, 100))
 
-# np.save(r'D:\JøFrå\Estudio\Facultad\Fisica\Science Bitch\Datos\Simulacion', Data)
+np.save(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\Simulacion', Data)
 
-# np.save(r'D:\JøFrå\Estudio\Facultad\Fisica\Science Bitch\Datos\Simulacion Random', RandomEscapeData)
+np.save(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\Simulacion Random', RandomEscapeData)
 
-# np.save(r'D:\JøFrå\Estudio\Facultad\Fisica\Science Bitch\Datos\Simulacion no Random', NonRandomEscapeData)
+np.save(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\Simulacion no Random', NonRandomEscapeData)
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RLS
 
