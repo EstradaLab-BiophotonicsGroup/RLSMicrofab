@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from statistics import median
 from matplotlib import cm
 
-Path = r'D:/JøFrå/Estudio/Facultad/Fisica/Science Bitch'
+Path = r'D:/JøFrå/Estudio/Facultad/Fisica/'
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FUNCTIONS
 
