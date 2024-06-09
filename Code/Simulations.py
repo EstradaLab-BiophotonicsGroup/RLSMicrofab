@@ -74,7 +74,11 @@ def EscapeFunction(NumberOfDaughters, GenerationTimes, EscapeFunction, Title, No
     ax.set_xlim([-1, 71])
     ax.tick_params(axis='both', which='major', labelsize=25)
     ax.legend(fontsize=25)
+    if Title != False:
+        ax.set_title(Title, pad=8, loc='center', color='darkviolet', font={'family': 'cursive', 'weight': 'bold', 'size': 52})
     RLSGraphIndependant, ax = plt.subplots(figsize=(18, 12))
+    if Title != False:
+        ax.set_title('Comparison of RLS', pad=8, loc='center', color='darkviolet', font={'family': 'cursive', 'weight': 'bold', 'size': 52})
     ax.scatter(np.arange(0, len(RLSWithoutLoss), 1), RLSWithoutLoss, label=NoEscapeLabel, color=NoEscapeColor, s = 200)
     ax.scatter(np.arange(0, len(RLSWithLoss), 1), RLSWithLoss, label=EscapeLabel, color=EscapeColor, s = 200, marker = 'X')
     ax.set_xlabel('Generation', labelpad=3.2, loc='center', size=32, color='black')
@@ -99,9 +103,9 @@ def LinearEscape(NumberOfDaughters, Min, Max):
 
 Data = InitialPopulationTimes()
 
-RandomEscapeData = EscapeFunction(Title='Random escape', NoEscapeLabel='No escape', EscapeLabel='Age-independant escape', NumberOfDaughters=Data['NumberOfDaughters'], GenerationTimes=Data['TrimmedLifeTimes'], EscapeFunction=RandomEscape(Data['NumberOfDaughters'], 0, 100), NoEscapeColor = (255/255, 160/255, 0/255), EscapeColor = (255/255, 0/255, 0/255))
+RandomEscapeData = EscapeFunction(Title=False, NoEscapeLabel='No escape', EscapeLabel='Age-independant escape', NumberOfDaughters=Data['NumberOfDaughters'], GenerationTimes=Data['TrimmedLifeTimes'], EscapeFunction=RandomEscape(Data['NumberOfDaughters'], 0, 100), NoEscapeColor = (255/255, 160/255, 0/255), EscapeColor = (255/255, 0/255, 0/255))
 
-NonRandomEscapeData = EscapeFunction(Title='Non-Random escape', NoEscapeLabel='No escape', EscapeLabel='Age-dependant escape', NumberOfDaughters=Data['NumberOfDaughters'], GenerationTimes=Data['TrimmedLifeTimes'], EscapeFunction=LinearEscape(Data['NumberOfDaughters'], 0, 100), NoEscapeColor = (255/255, 160/255, 0/255), EscapeColor = (0/255, 0/255, 255/255))
+NonRandomEscapeData = EscapeFunction(Title=False, NoEscapeLabel='No escape', EscapeLabel='Age-dependant escape', NumberOfDaughters=Data['NumberOfDaughters'], GenerationTimes=Data['TrimmedLifeTimes'], EscapeFunction=LinearEscape(Data['NumberOfDaughters'], 0, 100), NoEscapeColor = (255/255, 160/255, 0/255), EscapeColor = (0/255, 0/255, 255/255))
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Data saved
 
@@ -116,5 +120,3 @@ HistogramData.to_csv(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\Histogram Data.c
 
 RLSData = pd.DataFrame({"No escape": list(RandomEscapeData['RLSWithoutLoss']), "Age-independant escape": list(RandomEscapeData['RLSWithLoss']), "Age-dependant escape": list(NonRandomEscapeData['RLSWithLoss'])})
 RLSData.to_csv(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\RLS Data.csv', index=False) # CSV with the RLSs information.
-
-
