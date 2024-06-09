@@ -69,8 +69,8 @@ def EscapeFunction(NumberOfDaughters, GenerationTimes, EscapeFunction, Title, No
     ax.hist(DaughtersWithEscape, bins=Bins, edgecolor='black', linewidth=2, density=False, color=EscapeColor, label=EscapeLabel, align='left') #'darkviolet'
     ax.set_xlabel('Generation', labelpad=3.2, loc='center', size=32, color='black')
     ax.set_ylabel('Count', labelpad=3.2, loc='center', size=32, color='black')
-    ax.vlines(np.median(NumberOfDaughters), 0, max(Heights) + max(Heights) * 15 / 100, linewidth=5, linestyle='dashed', color='lightseagreen')
-    ax.vlines(np.median(DaughtersWithEscape), 0, max(Heights) + max(Heights) * 15 / 100, linewidth=5, linestyle='dashed', color='darkviolet')
+    ax.vlines(np.median(NumberOfDaughters), 0, max(Heights) + max(Heights) * 15 / 100, linewidth=5, linestyle='dashed', color=NoEscapeLabel)
+    ax.vlines(np.median(DaughtersWithEscape), 0, max(Heights) + max(Heights) * 15 / 100, linewidth=5, linestyle='dashed', color=EscapeLabel)
     ax.set_xlim([-1, 71])
     ax.tick_params(axis='both', which='major', labelsize=25)
     ax.legend(fontsize=25)
