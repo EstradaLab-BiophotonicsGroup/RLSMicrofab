@@ -6,7 +6,22 @@ from numpy import random as rnd
 from scipy.special import gamma
 from numpy import matlib as mtlb
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POPULATION FUNCTION
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GENERAL FUNTCIONS
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RLS
+
+def Accumulated(DataSorted):
+    Step = []
+    n=0
+    for i in range(0,len(DataSorted)):
+        if DataSorted[i] == DataSorted[i-1]:
+            n+=1
+            Step.append(i+n)
+        else:
+            Step.append(i+n)
+    return(np.flip(Step))
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Population
 
 # The following function generates an amount of generations for "NumberOfCells" mother cells, which are given by a Weibull distribution.
 def InitialPopulationTimes(NumberOfCells=6000, MaxGenerations=100, Exponent=-0.4, AverageBirthTime=90, BirthTimeStdDev=2, AverageGenerations=25, GenerationsStdDev=5, WeibullK=2, Asymmetry=True, InvertExponential=True):
@@ -36,41 +51,34 @@ def InitialPopulationTimes(NumberOfCells=6000, MaxGenerations=100, Exponent=-0.4
     Data['TrimmedLifeTimes'] = BirthsPerMother
     return(Data)
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% APPLICATION OF ESCAPE FUNCTION
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Escape aplicator
 
 def EscapeFunction(NumberOfDaughters, GenerationTimes, EscapeFunction, Title, NoEscapeLabel, EscapeLabel, NoEscapeColor, EscapeColor):
     Data = {}
     Data['EscapeFunction'] = EscapeFunction
+    RLSWithoutLoss = Accumulated(np.sort(NumberOfDaughters))
+    RLSWithoutLoss = RLSWithoutLoss/max(RLSWithoutLoss)
+    Data['RLSWithoutLoss'] = RLSWithoutLoss
     if isinstance(EscapeFunction[0], np.bool_):
         DaughtersWithEscape = NumberOfDaughters[EscapeFunction]
         Data['DaughtersWithEscape'] = DaughtersWithEscape
-        MothersWithoutLoss = np.isfinite(GenerationTimes)
-        MothersWithoutLossRLS = np.sum(MothersWithoutLoss, 0)
-        RLSWithoutLoss = MothersWithoutLossRLS/MothersWithoutLossRLS.max()
-        Data['RLSWithoutLoss'] = RLSWithoutLoss
-        MothersWithLoss = np.isfinite(GenerationTimes)
-        MothersWithLossRLS = np.sum(MothersWithLoss[EscapeFunction], 0)
-        RLSWithLoss = MothersWithLossRLS/MothersWithLossRLS.max()
+        RLSWithLoss = Accumulated(np.sort(DaughtersWithEscape))
+        RLSWithLoss = RLSWithLoss/max(RLSWithLoss)
         Data['RLSWithLoss'] = RLSWithLoss
     else:
         EscapePositions = np.array(NumberOfDaughters)<np.array(EscapeFunction)
         DaughtersWithEscape = np.array(NumberOfDaughters)[EscapePositions]
         Data['DaughtersWithEscape'] = DaughtersWithEscape
-        MothersWithoutLoss = np.isfinite(GenerationTimes)
-        MothersWithoutLossRLS = np.sum(MothersWithoutLoss, axis=0)
-        RLSWithoutLoss = MothersWithoutLossRLS/MothersWithoutLossRLS.max()
-        Data['RLSWithoutLoss'] = RLSWithoutLoss
-        MothersWithLoss = np.isfinite(GenerationTimes)
-        MothersWithLossRLS = np.sum(MothersWithLoss[EscapePositions], axis=0)
-        RLSWithLoss = MothersWithLossRLS/MothersWithLossRLS.max()
+        RLSWithLoss = Accumulated(np.sort(DaughtersWithEscape))
+        RLSWithLoss = RLSWithLoss/max(RLSWithLoss)
         Data['RLSWithLoss'] = RLSWithLoss
     EscapePlot, ax = plt.subplots(figsize=(18, 12))
     Heights, Bins, _ = ax.hist(NumberOfDaughters, bins=max(NumberOfDaughters), edgecolor='black', linewidth=2, density=False, color=NoEscapeColor, label=NoEscapeLabel, align='left') #'lightseagreen'
     ax.hist(DaughtersWithEscape, bins=Bins, edgecolor='black', linewidth=2, density=False, color=EscapeColor, label=EscapeLabel, align='left') #'darkviolet'
     ax.set_xlabel('Generation', labelpad=3.2, loc='center', size=32, color='black')
     ax.set_ylabel('Count', labelpad=3.2, loc='center', size=32, color='black')
-    ax.vlines(np.median(NumberOfDaughters), 0, max(Heights) + max(Heights) * 15 / 100, linewidth=5, linestyle='dashed', color=NoEscapeColor)
-    ax.vlines(np.median(DaughtersWithEscape), 0, max(Heights) + max(Heights) * 15 / 100, linewidth=5, linestyle='dashed', color=EscapeColor)
+    ax.vlines(np.median(NumberOfDaughters), 0, max(Heights)+max(Heights)*15/100, linewidth=5, linestyle='dashed', color=NoEscapeColor)
+    ax.vlines(np.median(DaughtersWithEscape), 0, max(Heights)+max(Heights)*15/100, linewidth=5, linestyle='dashed', color=EscapeColor)
     ax.set_xlim([-1, 71])
     ax.tick_params(axis='both', which='major', labelsize=25)
     ax.legend(fontsize=25)
@@ -79,15 +87,15 @@ def EscapeFunction(NumberOfDaughters, GenerationTimes, EscapeFunction, Title, No
     RLSGraphIndependant, ax = plt.subplots(figsize=(18, 12))
     if Title != False:
         ax.set_title('Comparison of RLS', pad=8, loc='center', color='darkviolet', font={'family': 'cursive', 'weight': 'bold', 'size': 52})
-    ax.scatter(np.arange(0, len(RLSWithoutLoss), 1), RLSWithoutLoss, label=NoEscapeLabel, color=NoEscapeColor, s = 200)
-    ax.scatter(np.arange(0, len(RLSWithLoss), 1), RLSWithLoss, label=EscapeLabel, color=EscapeColor, s = 200, marker = 'X')
+    ax.scatter(np.sort(NumberOfDaughters), RLSWithoutLoss, label=NoEscapeLabel, color=NoEscapeColor, s = 200)
+    ax.scatter(np.sort(DaughtersWithEscape), RLSWithLoss, label=EscapeLabel, color=EscapeColor, s = 200, marker = 'X')
     ax.set_xlabel('Generation', labelpad=3.2, loc='center', size=32, color='black')
     ax.set_ylabel('Fraction Viable', labelpad=3.2, loc='center', size=32, color='black')
     ax.tick_params(axis='both', which='major', labelsize=25)
     ax.legend(fontsize=25)
     return(Data)
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ESCAPE FUNCTION
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Diferents Escapes
 
 def RandomEscape(NumberOfDaughters, Min, Max):
     LinearDeath1 = rnd.randint(Min, Max, len(NumberOfDaughters))
@@ -107,7 +115,7 @@ RandomEscapeData = EscapeFunction(Title=False, NoEscapeLabel='No escape', Escape
 
 NonRandomEscapeData = EscapeFunction(Title=False, NoEscapeLabel='No escape', EscapeLabel='Age-dependant escape', NumberOfDaughters=Data['NumberOfDaughters'], GenerationTimes=Data['TrimmedLifeTimes'], EscapeFunction=LinearEscape(Data['NumberOfDaughters'], 0, 100), NoEscapeColor = (255/255, 160/255, 0/255), EscapeColor = (0/255, 0/255, 255/255))
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Data saved
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SAVE DATA
 
 # np.save(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\Simulacion', Data) # Dictionary saved as .npy containing all the information of the cell population created by the function InitialPopulationTimes.
 
@@ -116,7 +124,76 @@ NonRandomEscapeData = EscapeFunction(Title=False, NoEscapeLabel='No escape', Esc
 # np.save(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\Simulacion no Random', NonRandomEscapeData) # Dictionary saved as .npy containing all the information of the cell population with the escape "RandomEscapeData" applied.
 
 HistogramData = pd.DataFrame({"No escape": list(Data['NumberOfDaughters']), "Age-independant escape": list(RandomEscapeData['DaughtersWithEscape'])+[None]*(len(Data['NumberOfDaughters'])-len(RandomEscapeData['DaughtersWithEscape'])), "Age-dependant escape": list(NonRandomEscapeData['DaughtersWithEscape'])+[None]*(len(Data['NumberOfDaughters'])-len(NonRandomEscapeData['DaughtersWithEscape']))})
-HistogramData.to_csv(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\Histogram Data.csv', index=False) # CSV with the histograms information.
+HistogramData.to_csv(r'C:\Users\JøFrå\Desktop\Histogram Data.csv', index=False) # CSV with the histograms information.
 
-RLSData = pd.DataFrame({"No escape": list(RandomEscapeData['RLSWithoutLoss']), "Age-independant escape": list(RandomEscapeData['RLSWithLoss']), "Age-dependant escape": list(NonRandomEscapeData['RLSWithLoss'])})
-RLSData.to_csv(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\RLS Data.csv', index=False) # CSV with the RLSs information.
+del RandomEscapeData
+del NonRandomEscapeData
+
+#%%########################################################################### DATA LOADING AND VISUALIZATION
+
+Data = pd.read_csv(r'C:\Users\JøFrå\Desktop\Histogram Data.csv', delimiter=',')
+
+IndependantPlot, ax = plt.subplots(figsize=(18, 12))
+Heights, Bins, _ = ax.hist(Data['No escape'], bins=max(Data['No escape']), edgecolor='black', linewidth=2, density=False, color=(255/255, 160/255, 0/255), label='No escape', align='left')
+ax.hist(Data['Age-independant escape'], bins=Bins, edgecolor='black', linewidth=2, density=False, color=(255/255, 0/255, 0/255), label='Age-independant escape', align='left')
+ax.set_xlabel('Generation', labelpad=3.2, loc='center', size=32, color='black')
+ax.set_ylabel('Count', labelpad=3.2, loc='center', size=32, color='black')
+ax.vlines(np.median(Data['No escape']), 0, max(Heights)+max(Heights)*15/100, linewidth=5, linestyle='dashed', color=(255/255, 160/255, 0/255))
+ax.vlines(np.median(Data['Age-independant escape'].dropna()), 0, max(Heights)+max(Heights)*15/100, linewidth=5, linestyle='dashed', color=(255/255, 0/255, 0/255))
+ax.set_xlim([-1, 71])
+ax.tick_params(axis='both', which='major', labelsize=25)
+ax.legend(fontsize=25)
+
+DependantPlot, ax = plt.subplots(figsize=(18, 12))
+Heights, Bins, _ = ax.hist(Data['No escape'], bins=max(Data['No escape']), edgecolor='black', linewidth=2, density=False, color=(255/255, 160/255, 0/255), label='No escape', align='left')
+ax.hist(Data['Age-dependant escape'], bins=Bins, edgecolor='black', linewidth=2, density=False, color=(0/255, 0/255, 255/255), label='Age-dependant escape', align='left')
+ax.set_xlabel('Generation', labelpad=3.2, loc='center', size=32, color='black')
+ax.set_ylabel('Count', labelpad=3.2, loc='center', size=32, color='black')
+ax.vlines(np.median(Data['No escape']), 0, max(Heights)+max(Heights)*15/100, linewidth=5, linestyle='dashed', color=(255/255, 160/255, 0/255))
+ax.vlines(np.median(Data['Age-dependant escape'].dropna()), 0, max(Heights)+max(Heights)*15/100, linewidth=5, linestyle='dashed', color=(0/255, 0/255, 255/255))
+ax.set_xlim([-1, 71])
+ax.tick_params(axis='both', which='major', labelsize=25)
+ax.legend(fontsize=25)
+
+# Create RLSs curve since histogram data
+DataSortedNoEscape = np.sort(Data['No escape'].dropna())
+DataSortedDependantEscape = np.sort(Data['Age-dependant escape'].dropna())
+DataSortedIndependantEscape = np.sort(Data['Age-independant escape'].dropna())
+
+RLSNoEscape = Accumulated(DataSortedNoEscape)
+RLSDependant = Accumulated(DataSortedDependantEscape)
+RLSIndependant = Accumulated(DataSortedIndependantEscape)
+
+RLSs = {'No escape': RLSNoEscape/max(RLSNoEscape), 'Age-independant escape': RLSIndependant/max(RLSIndependant), 'Age-dependant escape': RLSDependant/max(RLSDependant)} 
+
+RLSGraphIndependant, ax = plt.subplots(figsize=(18, 12))
+ax.scatter(DataSortedNoEscape, RLSs['No escape'], label='No escape', color=(255/255, 160/255, 0/255), s = 200)
+ax.scatter(DataSortedIndependantEscape, RLSs['Age-independant escape'], label='Age-independant escape', color=(255/255, 0/255, 0/255), s = 200, marker = 'X')
+ax.set_xlabel('Generation', labelpad=3.2, loc='center', size=32, color='black')
+ax.set_ylabel('Fraction Viable', labelpad=3.2, loc='center', size=32, color='black')
+ax.tick_params(axis='both', which='major', labelsize=25)
+ax.legend(fontsize=25)
+
+RLSGraphDependant, ax = plt.subplots(figsize=(18, 12))
+ax.scatter(DataSortedNoEscape, RLSs['No escape'], label='No escape', color=(255/255, 160/255, 0/255), s = 200)
+ax.scatter(DataSortedDependantEscape, RLSs['Age-dependant escape'], label='Age-dependant escape', color=(0/255, 0/255, 255/255), s = 200, marker = 'X')
+ax.set_xlabel('Generation', labelpad=3.2, loc='center', size=32, color='black')
+ax.set_ylabel('Fraction Viable', labelpad=3.2, loc='center', size=32, color='black')
+ax.tick_params(axis='both', which='major', labelsize=25)
+ax.legend(fontsize=25)
+
+# Cleanup variables no longer needed
+del ax
+del Bins
+del RLSs
+del Heights
+del RLSNoEscape
+del RLSDependant
+del DependantPlot
+del RLSIndependant
+del IndependantPlot
+del RLSGraphDependant
+del DataSortedNoEscape
+del RLSGraphIndependant
+del DataSortedDependantEscape
+del DataSortedIndependantEscape
