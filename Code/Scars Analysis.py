@@ -127,11 +127,11 @@ plt.savefig(Path+'/Imagenes/5D - Accounting for unobserved daughter.png', dpi=60
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SAVE DATA
 
 FinalMedians = pd.DataFrame({"Experiment All Together": list(FinalMedians['Experiment All Together']), "Experiment No. 1": list(FinalMedians['Experiment No. 1'])+[None]*(len(FinalMedians['Experiment All Together'])-len(FinalMedians['Experiment No. 1'])),  "Experiment No. 2": list(FinalMedians['Experiment No. 2'])+[None]*(len(FinalMedians['Experiment All Together'])-len(FinalMedians['Experiment No. 2']))})
-FinalMedians.to_csv(Path+'/Datos/Final Medians.csv', index=False) # CSV with the histograms information.
+FinalMedians.to_csv(Path+'/Datos/6A 6B - Simulated Data.csv', index=False) # CSV with the histograms information.
 
 #%%########################################################################### DATA LOADING AND VISUALIZATION
 
-Data = pd.read_csv(Path+'/Datos/Final Medians.csv', delimiter=',')
+Data = pd.read_csv(Path+'/Datos/6A 6B - Simulated Data.csv', delimiter=',')
 
 #%%%########################################################################## Comparison of Medians
 
