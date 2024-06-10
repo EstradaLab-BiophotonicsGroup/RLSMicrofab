@@ -123,23 +123,3 @@ plt.vlines(median(Experiments['All Together']['Generations']), 0, max(np.histogr
 plt.xlabel('Medians', size=14)
 plt.ylabel('Count', size=14)
 plt.savefig(Path+'/Imagenes/5D - Accounting for unobserved daughter.png', dpi=600)
-
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SAVE DATA
-
-FinalMedians = pd.DataFrame({"Experiment All Together": list(FinalMedians['Experiment All Together']), "Experiment No. 1": list(FinalMedians['Experiment No. 1'])+[None]*(len(FinalMedians['Experiment All Together'])-len(FinalMedians['Experiment No. 1'])),  "Experiment No. 2": list(FinalMedians['Experiment No. 2'])+[None]*(len(FinalMedians['Experiment All Together'])-len(FinalMedians['Experiment No. 2']))})
-FinalMedians.to_csv(Path+'/Datos/6A 6B - Simulated Data.csv', index=False) # CSV with the histograms information.
-
-#%%########################################################################### DATA LOADING AND VISUALIZATION
-
-Data = pd.read_csv(Path+'/Datos/6A 6B - Simulated Data.csv', delimiter=',')
-
-#%%%########################################################################## Comparison of Medians
-
-plt.figure('Median Shift')
-# Plot histogram of final medians for each experiment
-plt.hist(Data['Experiment All Together'], bins=np.arange(13, 20, 1), edgecolor='black', linewidth=1.2, rwidth = 0.5, align='left', color=(0/255, 10/255, 10/255))
-# Add a vertical line for the median of the generations in the current experiment
-plt.vlines(median(Experiments['All Together']['Generations']), 0, max(np.histogram(Data['Experiment All Together'])[0])+max(np.histogram(Data['Experiment All Together'])[0])*5/100, linewidth=2, color=(255/255, 177/255, 77/255))
-plt.xlabel('Medians', size=14)
-plt.ylabel('Count', size=14)
-plt.savefig(Path+'/Imagenes/5D - Accounting for unobserved daughter.png', dpi=600)
