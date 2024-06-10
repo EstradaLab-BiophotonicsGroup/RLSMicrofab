@@ -1,12 +1,12 @@
+import os
 import random
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import os
 
 from statistics import median
 
-Path = r'C:\Users\maximiliano.godas\Desktop\Paper\Datos'
+Path = input('Please, enter the path name where the data is located\nPath=')
 
 #%%%% FUNCTIONS
 
@@ -102,8 +102,8 @@ del n
 
 #% Calcofluor and Daughters
 
-if not os.path.exists(Path + '\Figures'): 
-    os.makedirs(Path + '\Figures') 
+# if not os.path.exists(Path + '\Figures'): 
+#     os.makedirs(Path + '\Figures') 
 
 plt.figure('Generations All Together')
 # Histogram for Scars (CalcoFluor)
@@ -115,27 +115,31 @@ plt.vlines(median(CalcoFluor['All Together']['Scars_finales']), 0, max(np.histog
 plt.ylabel('Count', size=14)
 plt.xlabel('Generations', size=14)
 plt.legend()
-plt.savefig(Path+r'\Figures\5C - Overlay of age distributions.png', dpi=600)
+# plt.savefig(Path+r'\Figures\5C - Overlay of age distributions.png', dpi=600)
 
 #% Comparison of Medians
 
-plt.figure('Median Shift')
+plt.figure('Median Shift (New)')
 # Plot histogram of final medians for each experiment
 plt.hist(FinalMedians['Experiment All Together'], bins=np.arange(13, 20, 1), edgecolor='black', linewidth=1.2, rwidth = 0.5, align='left', color=(0/255, 10/255, 10/255))
 # Add a vertical line for the median of the generations in the current experiment
 plt.vlines(median(Experiments['All Together']['Generations']), 0, max(np.histogram(FinalMedians['Experiment All Together'])[0])+max(np.histogram(FinalMedians['Experiment All Together'])[0])*5/100, linewidth=2, color=(255/255, 177/255, 77/255))
 plt.xlabel('Medians', size=14)
 plt.ylabel('Count', size=14)
-plt.savefig(Path+r'\Figures\5D - Accounting for unobserved daughter.png', dpi=600)
+plt.title('New bootstrapping')
+# plt.savefig(Path+r'\Figures\5D - Accounting for unobserved daughter.png', dpi=600)
 
 #% SAVE DATA
 
+if not os.path.exists(Path + r'\New Data'): 
+    os.makedirs(Path+r'\New Data') 
+
 FinalMedians = pd.DataFrame({"Experiment All Together": list(FinalMedians['Experiment All Together']), "Experiment No. 1": list(FinalMedians['Experiment No. 1'])+[None]*(len(FinalMedians['Experiment All Together'])-len(FinalMedians['Experiment No. 1'])),  "Experiment No. 2": list(FinalMedians['Experiment No. 2'])+[None]*(len(FinalMedians['Experiment All Together'])-len(FinalMedians['Experiment No. 2']))})
-FinalMedians.to_csv(Path+r'\Medians File.csv', index=False) # CSV with the histograms information.
+FinalMedians.to_csv(Path+r'\New Data\5D - Medians File.csv', index=False) # CSV with the histograms information.
 
 #%%%% DATA LOADING AND VISUALIZATION
 
-Data = pd.read_csv(Path+r'\Medians File.csv', delimiter=',')
+Data = pd.read_csv(Path+r'\5D - Medians File.csv', delimiter=',')
 
 #% Comparison of Medians
  
@@ -146,6 +150,5 @@ plt.hist(Data['Experiment All Together'], bins=np.arange(13, 20, 1), edgecolor='
 plt.vlines(median(Experiments['All Together']['Generations']), 0, max(np.histogram(Data['Experiment All Together'])[0])+max(np.histogram(Data['Experiment All Together'])[0])*5/100, linewidth=2, color=(255/255, 177/255, 77/255))
 plt.xlabel('Medians', size=14)
 plt.ylabel('Count', size=14)
-plt.savefig(Path+r'\Figures\5D - Accounting for unobserved daughter.png', dpi=600)
-
-
+plt.title('Figure 5D')
+# plt.savefig(Path+r'\Figures\5D - Accounting for unobserved daughter.png', dpi=600)
