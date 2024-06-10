@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from statistics import median
 
-Path = r'D:/JøFrå/Estudio/Facultad/Fisica'
+Path = r'D:/JøFrå/Estudio/Facultad/Fisica' # General directory where the folder "Datos" conteins experimental data located.
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FUNCTIONS
 
@@ -14,14 +14,14 @@ NumberOfExperiments = 2
 def LoadData(NumberOfExperiments, Path = Path):
     Experiments = {}
     for n in range(1, NumberOfExperiments + 1):
-        Data = pd.read_csv(Path+'/Datos/Experimento {} con WT.csv'.format(n), delimiter=';', index_col='ID')
+        Data = pd.read_csv(Path+'/Datos/5C - Experiment {} WT.csv'.format(n), delimiter=';', index_col='ID')
         Experiments['No. {}'.format(n)] = Data
     return Experiments
 
 def LoadCalcoFluorData(NumberOfExperiments, Path = Path):
     Experiments = {}
     for n in range(1, NumberOfExperiments + 1):
-        Data = pd.read_csv(Path+'/Datos/Resultados de Experimento {} calcofluor en chip.csv'.format(n), delimiter=';', index_col='ID')
+        Data = pd.read_csv(Path+'/Datos/5C - Scars Experiment {}.csv'.format(n), delimiter=';', index_col='ID')
         Data.drop(columns=['Unnamed: 2'], inplace=True)
         Experiments['No. {}'.format(n)] = Data
     return Experiments
@@ -111,7 +111,7 @@ plt.vlines(median(CalcoFluor['All Together']['Scars_finales']), 0, max(np.histog
 plt.ylabel('Count', size=14)
 plt.xlabel('Generations', size=14)
 plt.legend()
-plt.savefig(Path+'/Imagenes/Datos juntos vs cicatrices juntas.png', dpi=600)
+plt.savefig(Path+'/Imagenes/5C - Overlay of age distributions.png', dpi=600)
 
 #%%%########################################################################## Comparison of Medians
 
@@ -122,4 +122,24 @@ plt.hist(FinalMedians['Experiment All Together'], bins=np.arange(13, 20, 1), edg
 plt.vlines(median(Experiments['All Together']['Generations']), 0, max(np.histogram(FinalMedians['Experiment All Together'])[0])+max(np.histogram(FinalMedians['Experiment All Together'])[0])*5/100, linewidth=2, color=(255/255, 177/255, 77/255))
 plt.xlabel('Medians', size=14)
 plt.ylabel('Count', size=14)
-plt.savefig(Path+'/Imagenes/Corrimiento de medianas juntas.png', dpi=600)
+plt.savefig(Path+'/Imagenes/5D - Accounting for unobserved daughter.png', dpi=600)
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SAVE DATA
+
+FinalMedians = pd.DataFrame({"Experiment All Together": list(FinalMedians['Experiment All Together']), "Experiment No. 1": list(FinalMedians['Experiment No. 1'])+[None]*(len(FinalMedians['Experiment All Together'])-len(FinalMedians['Experiment No. 1'])),  "Experiment No. 2": list(FinalMedians['Experiment No. 2'])+[None]*(len(FinalMedians['Experiment All Together'])-len(FinalMedians['Experiment No. 2']))})
+FinalMedians.to_csv(Path+'/Datos/Final Medians.csv', index=False) # CSV with the histograms information.
+
+#%%########################################################################### DATA LOADING AND VISUALIZATION
+
+Data = pd.read_csv(Path+'/Datos/Final Medians.csv', delimiter=',')
+
+#%%%########################################################################## Comparison of Medians
+
+plt.figure('Median Shift')
+# Plot histogram of final medians for each experiment
+plt.hist(Data['Experiment All Together'], bins=np.arange(13, 20, 1), edgecolor='black', linewidth=1.2, rwidth = 0.5, align='left', color=(0/255, 10/255, 10/255))
+# Add a vertical line for the median of the generations in the current experiment
+plt.vlines(median(Experiments['All Together']['Generations']), 0, max(np.histogram(Data['Experiment All Together'])[0])+max(np.histogram(Data['Experiment All Together'])[0])*5/100, linewidth=2, color=(255/255, 177/255, 77/255))
+plt.xlabel('Medians', size=14)
+plt.ylabel('Count', size=14)
+plt.savefig(Path+'/Imagenes/5D - Accounting for unobserved daughter.png', dpi=600)
