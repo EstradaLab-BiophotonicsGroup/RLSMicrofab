@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -6,7 +7,7 @@ from numpy import random as rnd
 from scipy.special import gamma
 from numpy import matlib as mtlb
 
-path = r'C:\Users\maximiliano.godas\Desktop\Paper\Datos'
+Path = input('Please, enter the path name where the data is located\nPath=')
 
 """
 This code consists of three cells:
@@ -60,7 +61,10 @@ def InitialPopulationTimes(NumberOfCells=6000, MaxGenerations=100, Exponent=-0.4
     return(Data)
 
 #% Escape aplicator
-def EscapeFunction(NumberOfDaughters, GenerationTimes, EscapeFunction, Title, NoEscapeLabel, EscapeLabel, NoEscapeColor, EscapeColor):
+def EscapeFunction(NumberOfDaughters, GenerationTimes, EscapeFunction, TitleAndSave, NoEscapeLabel, EscapeLabel, NoEscapeColor, EscapeColor):
+    if TitleAndSave != False:
+        if not os.path.exists(Path+'\Figures'): 
+            os.makedirs(Path+'\Figures')
     Data = {}
     Data['EscapeFunction'] = EscapeFunction
     RLSWithoutLoss = Accumulated(np.sort(NumberOfDaughters))
@@ -85,21 +89,27 @@ def EscapeFunction(NumberOfDaughters, GenerationTimes, EscapeFunction, Title, No
     ax.set_xlabel('Generation', labelpad=3.2, loc='center', size=32, color='black')
     ax.set_ylabel('Count', labelpad=3.2, loc='center', size=32, color='black')
     ax.vlines(np.median(NumberOfDaughters), 0, max(Heights)+max(Heights)*15/100, linewidth=5, linestyle='dashed', color=NoEscapeColor)
-    ax.vlines(np.median(DaughtersWithEscape), 0, max(Heights)+max(Heights)*15/100, linewidth=5, linestyle='dashed', color=EscapeColor)
+    ax.vlines(np.median(DaughtersWithEscape), 0, max(Heights)+max(Heights)*15/100, linewidth=5, linestyle='dotted', color=EscapeColor)
     ax.set_xlim([-1, 71])
     ax.tick_params(axis='both', which='major', labelsize=25)
     ax.legend(fontsize=25)
-    if Title != False:
-        ax.set_title(Title, pad=8, loc='center', color='darkviolet', font={'family': 'cursive', 'weight': 'bold', 'size': 52})
+    if TitleAndSave != False:
+        ax.set_title(TitleAndSave+' Using new generated data', pad=8, loc='center', fontsize=52)
+        plt.savefig(Path+'\Figures\(New simulated Data) '+TitleAndSave+'.png', dpi=600)
+    else:
+        ax.set_title('Using new generated data', pad=8, loc='center', fontsize=52)
     RLSGraphIndependant, ax = plt.subplots(figsize=(18, 12))
-    if Title != False:
-        ax.set_title('Comparison of RLS', pad=8, loc='center', color='darkviolet', font={'family': 'cursive', 'weight': 'bold', 'size': 52})
     ax.scatter(np.sort(NumberOfDaughters), RLSWithoutLoss, label=NoEscapeLabel, color=NoEscapeColor, s = 200)
     ax.scatter(np.sort(DaughtersWithEscape), RLSWithLoss, label=EscapeLabel, color=EscapeColor, s = 200, marker = 'X')
     ax.set_xlabel('Generation', labelpad=3.2, loc='center', size=32, color='black')
     ax.set_ylabel('Fraction Viable', labelpad=3.2, loc='center', size=32, color='black')
     ax.tick_params(axis='both', which='major', labelsize=25)
     ax.legend(fontsize=25)
+    if TitleAndSave != False:
+        ax.set_title('Using new generated data', pad=8, loc='center', fontsize=52)
+        plt.savefig(Path+'\Figures\(RLS new simulated Data) '+TitleAndSave+'.png', dpi=600)
+    else:
+        ax.set_title('Using new generated data', pad=8, loc='center', fontsize=52)
     return(Data)
 
 #% Diferents Escapes
@@ -117,23 +127,26 @@ def LinearEscape(NumberOfDaughters, Min, Max):
 #%% APPLICATION
 
 Data = InitialPopulationTimes()
-RandomEscapeData = EscapeFunction(Title=False, NoEscapeLabel='No escape', EscapeLabel='Age-independant escape', NumberOfDaughters=Data['NumberOfDaughters'], GenerationTimes=Data['TrimmedLifeTimes'], EscapeFunction=RandomEscape(Data['NumberOfDaughters'], 0, 100), NoEscapeColor = (255/255, 160/255, 0/255), EscapeColor = (255/255, 0/255, 0/255))
-NonRandomEscapeData = EscapeFunction(Title=False, NoEscapeLabel='No escape', EscapeLabel='Age-dependant escape', NumberOfDaughters=Data['NumberOfDaughters'], GenerationTimes=Data['TrimmedLifeTimes'], EscapeFunction=LinearEscape(Data['NumberOfDaughters'], 0, 100), NoEscapeColor = (255/255, 160/255, 0/255), EscapeColor = (0/255, 0/255, 255/255))
+RandomEscapeData = EscapeFunction(NoEscapeLabel='No escape', EscapeLabel='Age-independant escape', NumberOfDaughters=Data['NumberOfDaughters'], GenerationTimes=Data['TrimmedLifeTimes'], EscapeFunction=RandomEscape(Data['NumberOfDaughters'], 0, 100), NoEscapeColor = (255/255, 160/255, 0/255), EscapeColor = (255/255, 0/255, 0/255), TitleAndSave = False)
+NonRandomEscapeData = EscapeFunction(NoEscapeLabel='No escape', EscapeLabel='Age-dependant escape', NumberOfDaughters=Data['NumberOfDaughters'], GenerationTimes=Data['TrimmedLifeTimes'], EscapeFunction=LinearEscape(Data['NumberOfDaughters'], 0, 100), NoEscapeColor = (255/255, 160/255, 0/255), EscapeColor = (0/255, 0/255, 255/255), TitleAndSave = False)
 
 #%SAVE DATA
+
+if not os.path.exists(Path+r'\New Data'): 
+    os.makedirs(Path+r'\New Data') 
 
 # np.save(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\Simulacion', Data) # Dictionary saved as .npy containing all the information of the cell population created by the function InitialPopulationTimes.
 # np.save(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\Simulacion Random', RandomEscapeData) # Dictionary saved as .npy containing all the information of the cell population with the escape "RandomEscapeData" applied.
 # np.save(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\Simulacion no Random', NonRandomEscapeData) # Dictionary saved as .npy containing all the information of the cell population with the escape "RandomEscapeData" applied.
 HistogramData = pd.DataFrame({"No escape": list(Data['NumberOfDaughters']), "Age-independant escape": list(RandomEscapeData['DaughtersWithEscape'])+[None]*(len(Data['NumberOfDaughters'])-len(RandomEscapeData['DaughtersWithEscape'])), "Age-dependant escape": list(NonRandomEscapeData['DaughtersWithEscape'])+[None]*(len(Data['NumberOfDaughters'])-len(NonRandomEscapeData['DaughtersWithEscape']))})
-HistogramData.to_csv(path + '\Histogram Data.csv', index=False) # CSV with the histograms information.
+HistogramData.to_csv(Path + r'\New Data\6A 6B - Simulated Data.csv', index=False) # CSV with the histograms information.
 
 del RandomEscapeData
 del NonRandomEscapeData
 
 #%%% DATA LOADING AND VISUALIZATION %%%#
 
-Data = pd.read_csv(path + r'\6A 6B - Simulated Data.csv', delimiter=',')
+Data = pd.read_csv(Path + r'\6A 6B - Simulated Data.csv', delimiter=',')
 
 IndependantPlot, ax = plt.subplots(figsize=(18, 12))
 Heights, Bins, _ = ax.hist(Data['No escape'], bins=max(Data['No escape']), edgecolor='black', linewidth=2, density=False, color=(255/255, 160/255, 0/255), label='No escape', align='left')
@@ -141,9 +154,10 @@ ax.hist(Data['Age-independant escape'], bins=Bins, edgecolor='black', linewidth=
 ax.set_xlabel('Generation', labelpad=3.2, loc='center', size=32, color='black')
 ax.set_ylabel('Count', labelpad=3.2, loc='center', size=32, color='black')
 ax.vlines(np.median(Data['No escape']), 0, max(Heights)+max(Heights)*15/100, linewidth=5, linestyle='dashed', color=(255/255, 160/255, 0/255))
-ax.vlines(np.median(Data['Age-independant escape'].dropna()), 0, max(Heights)+max(Heights)*15/100, linewidth=5, linestyle='dashed', color=(255/255, 0/255, 0/255))
+ax.vlines(np.median(Data['Age-independant escape'].dropna()), 0, max(Heights)+max(Heights)*15/100, linewidth=5, linestyle='dotted', color=(255/255, 0/255, 0/255))
 ax.set_xlim([-1, 71])
 ax.tick_params(axis='both', which='major', labelsize=25)
+plt.title('Using data from DATA folder', fontsize = 42, pad = 18, loc = 'center')
 ax.legend(fontsize=25)
 
 DependantPlot, ax = plt.subplots(figsize=(18, 12))
@@ -155,6 +169,7 @@ ax.vlines(np.median(Data['No escape']), 0, max(Heights)+max(Heights)*15/100, lin
 ax.vlines(np.median(Data['Age-dependant escape'].dropna()), 0, max(Heights)+max(Heights)*15/100, linewidth=5, linestyle='dashed', color=(0/255, 0/255, 255/255))
 ax.set_xlim([-1, 71])
 ax.tick_params(axis='both', which='major', labelsize=25)
+plt.title('Using data from DATA folder', fontsize = 42, pad = 18, loc = 'center')
 ax.legend(fontsize=25)
 
 # Create RLSs curve since histogram data
@@ -174,6 +189,7 @@ ax.scatter(DataSortedIndependantEscape, RLSs['Age-independant escape'], label='A
 ax.set_xlabel('Generation', labelpad=3.2, loc='center', size=32, color='black')
 ax.set_ylabel('Fraction Viable', labelpad=3.2, loc='center', size=32, color='black')
 ax.tick_params(axis='both', which='major', labelsize=25)
+plt.title('Using data from DATA folder', fontsize = 42, pad = 18, loc = 'center')
 ax.legend(fontsize=25)
 
 RLSGraphDependant, ax = plt.subplots(figsize=(18, 12))
@@ -182,6 +198,7 @@ ax.scatter(DataSortedDependantEscape, RLSs['Age-dependant escape'], label='Age-d
 ax.set_xlabel('Generation', labelpad=3.2, loc='center', size=32, color='black')
 ax.set_ylabel('Fraction Viable', labelpad=3.2, loc='center', size=32, color='black')
 ax.tick_params(axis='both', which='major', labelsize=25)
+plt.title('Using data from DATA folder', fontsize = 42, pad = 18, loc = 'center')
 ax.legend(fontsize=25)
 
 # Cleanup variables no longer needed
@@ -199,3 +216,4 @@ del DataSortedNoEscape
 del RLSGraphIndependant
 del DataSortedDependantEscape
 del DataSortedIndependantEscape
+
