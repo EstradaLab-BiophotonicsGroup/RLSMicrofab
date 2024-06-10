@@ -131,7 +131,7 @@ del NonRandomEscapeData
 
 #%%########################################################################### DATA LOADING AND VISUALIZATION
 
-Data = pd.read_csv(r'C:\Users\JøFrå\Desktop\Histogram Data.csv', delimiter=',')
+Data = pd.read_csv(r'C:\Users\JøFrå\Desktop\6A 6B - Simulated Data.csv', delimiter=',')
 
 IndependantPlot, ax = plt.subplots(figsize=(18, 12))
 Heights, Bins, _ = ax.hist(Data['No escape'], bins=max(Data['No escape']), edgecolor='black', linewidth=2, density=False, color=(255/255, 160/255, 0/255), label='No escape', align='left')
