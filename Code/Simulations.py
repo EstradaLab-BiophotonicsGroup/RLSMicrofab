@@ -6,11 +6,20 @@ from numpy import random as rnd
 from scipy.special import gamma
 from numpy import matlib as mtlb
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% GENERAL FUNTCIONS
+path = r'C:\Users\maximiliano.godas\Desktop\Paper\Datos'
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% RLS
+"""
+This code consists of three cells:
+    1°)Generates the necessary general functions.
+    2°)Creates new simulated data by applying the simulation.
+    3°)Reproduces the figures shown in the paper by plotting the simulated data.
+    To use the last cell, you need to download the file named "6A 6B - Simulated Data".
+"""
 
-def Accumulated(DataSorted):
+#%%% GENERAL FUNTCIONS %%%#
+
+#%to do the RLS curve
+def Accumulated(DataSorted): 
     Step = []
     n=0
     for i in range(0,len(DataSorted)):
@@ -21,8 +30,7 @@ def Accumulated(DataSorted):
             Step.append(i+n)
     return(np.flip(Step))
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Population
-
+#%Population
 # The following function generates an amount of generations for "NumberOfCells" mother cells, which are given by a Weibull distribution.
 def InitialPopulationTimes(NumberOfCells=6000, MaxGenerations=100, Exponent=-0.4, AverageBirthTime=90, BirthTimeStdDev=2, AverageGenerations=25, GenerationsStdDev=5, WeibullK=2, Asymmetry=True, InvertExponential=True):
     Data = {}
@@ -51,8 +59,7 @@ def InitialPopulationTimes(NumberOfCells=6000, MaxGenerations=100, Exponent=-0.4
     Data['TrimmedLifeTimes'] = BirthsPerMother
     return(Data)
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Escape aplicator
-
+#% Escape aplicator
 def EscapeFunction(NumberOfDaughters, GenerationTimes, EscapeFunction, Title, NoEscapeLabel, EscapeLabel, NoEscapeColor, EscapeColor):
     Data = {}
     Data['EscapeFunction'] = EscapeFunction
@@ -95,7 +102,7 @@ def EscapeFunction(NumberOfDaughters, GenerationTimes, EscapeFunction, Title, No
     ax.legend(fontsize=25)
     return(Data)
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Diferents Escapes
+#% Diferents Escapes
 
 def RandomEscape(NumberOfDaughters, Min, Max):
     LinearDeath1 = rnd.randint(Min, Max, len(NumberOfDaughters))
@@ -107,31 +114,26 @@ def LinearEscape(NumberOfDaughters, Min, Max):
     LinearDeath = rnd.randint(Min, Max, len(NumberOfDaughters)) / 2
     return LinearDeath
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% APPLICATIONS
+#%% APPLICATION
 
 Data = InitialPopulationTimes()
-
 RandomEscapeData = EscapeFunction(Title=False, NoEscapeLabel='No escape', EscapeLabel='Age-independant escape', NumberOfDaughters=Data['NumberOfDaughters'], GenerationTimes=Data['TrimmedLifeTimes'], EscapeFunction=RandomEscape(Data['NumberOfDaughters'], 0, 100), NoEscapeColor = (255/255, 160/255, 0/255), EscapeColor = (255/255, 0/255, 0/255))
-
 NonRandomEscapeData = EscapeFunction(Title=False, NoEscapeLabel='No escape', EscapeLabel='Age-dependant escape', NumberOfDaughters=Data['NumberOfDaughters'], GenerationTimes=Data['TrimmedLifeTimes'], EscapeFunction=LinearEscape(Data['NumberOfDaughters'], 0, 100), NoEscapeColor = (255/255, 160/255, 0/255), EscapeColor = (0/255, 0/255, 255/255))
 
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SAVE DATA
+#%SAVE DATA
 
 # np.save(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\Simulacion', Data) # Dictionary saved as .npy containing all the information of the cell population created by the function InitialPopulationTimes.
-
 # np.save(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\Simulacion Random', RandomEscapeData) # Dictionary saved as .npy containing all the information of the cell population with the escape "RandomEscapeData" applied.
-
 # np.save(r'D:\JøFrå\Estudio\Facultad\Fisica\Datos\Simulacion no Random', NonRandomEscapeData) # Dictionary saved as .npy containing all the information of the cell population with the escape "RandomEscapeData" applied.
-
 HistogramData = pd.DataFrame({"No escape": list(Data['NumberOfDaughters']), "Age-independant escape": list(RandomEscapeData['DaughtersWithEscape'])+[None]*(len(Data['NumberOfDaughters'])-len(RandomEscapeData['DaughtersWithEscape'])), "Age-dependant escape": list(NonRandomEscapeData['DaughtersWithEscape'])+[None]*(len(Data['NumberOfDaughters'])-len(NonRandomEscapeData['DaughtersWithEscape']))})
-HistogramData.to_csv(r'C:\Users\JøFrå\Desktop\Histogram Data.csv', index=False) # CSV with the histograms information.
+HistogramData.to_csv(path + '\Histogram Data.csv', index=False) # CSV with the histograms information.
 
 del RandomEscapeData
 del NonRandomEscapeData
 
-#%%########################################################################### DATA LOADING AND VISUALIZATION
+#%%% DATA LOADING AND VISUALIZATION %%%#
 
-Data = pd.read_csv(r'C:\Users\JøFrå\Desktop\6A 6B - Simulated Data.csv', delimiter=',')
+Data = pd.read_csv(path + r'\6A 6B - Simulated Data.csv', delimiter=',')
 
 IndependantPlot, ax = plt.subplots(figsize=(18, 12))
 Heights, Bins, _ = ax.hist(Data['No escape'], bins=max(Data['No escape']), edgecolor='black', linewidth=2, density=False, color=(255/255, 160/255, 0/255), label='No escape', align='left')
