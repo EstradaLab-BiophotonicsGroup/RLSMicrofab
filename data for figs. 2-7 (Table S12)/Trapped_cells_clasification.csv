@@ -1,0 +1,14 @@
+Chip 1,,,
+Experiment ID,Downstream budding,Upstream budding,Censored 
+1,6,16,45
+3,120,34,148
+4,134,232,98
+5,670,237,199
+,,,
+,,,
+Chip 2,,,
+Experiment ID,Downstream budding,Upstream budding,Censored 
+2,247,112,99
+6,157,80,80
+10,323,174,98
+12,307,151,150
