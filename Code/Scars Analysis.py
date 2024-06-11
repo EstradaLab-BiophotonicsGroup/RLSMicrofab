@@ -8,7 +8,7 @@ from statistics import median
 
 Path = input('Please, enter the path name where the data is located\nPath=')
 
-#%%%% FUNCTIONS
+#%%%%% FUNCTIONS
 
 NumberOfExperiments = 2
 
